@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace ArrayExercises
 {
@@ -6,7 +7,11 @@ namespace ArrayExercises
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello Arrays!");
+            int[] myArray = new int[] { 1, 1, 2, 3, 5, 8 };
+
+            foreach(int myInt in myArray.Where(x => x % 2 == 0))
+                Console.WriteLine(myInt);
+
         }
     }
 }

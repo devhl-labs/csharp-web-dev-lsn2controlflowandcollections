@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.CompilerServices;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.Serialization.Formatters;
 
 namespace ListGradebook
 {
@@ -7,8 +11,8 @@ namespace ListGradebook
     {
         static void Main(string[] args)
         {
-            List<string> students = new List<string>();
-            List<double> grades = new List<double>();
+            Dictionary<int, Student> students = new Dictionary<int, Student>();
+
             string newStudent;
             string input;
 
@@ -18,36 +22,67 @@ namespace ListGradebook
             do
             {
                 input = Console.ReadLine();
+
                 newStudent = input;
 
-                if (!Equals(newStudent, ""))
+                if (newStudent != string.Empty)
                 {
-                    students.Add(newStudent);
+                    int id = 1;
+                    
+                    if (students.Count > 0)
+                        id = students.Max(s => s.Key) + 1;
+
+                    students.Add(id, new Student(id, input));
                 }
 
-            } while (!Equals(newStudent, ""));
+            } while (newStudent != string.Empty);
 
             // Get student grades
-            foreach (string student in students)
+            foreach (Student student in students.Values)
             {
-                Console.WriteLine("Grade for " + student + ": ");
+                Console.WriteLine("Enter space separated list of grades for " + student.Name + ": ");
+                
                 input = Console.ReadLine();
-                double grade = Double.Parse(input);
-                grades.Add(grade);
+
+                foreach(string str in input.Split(' '))
+                {
+                    if (double.TryParse(str, out double grade))
+                    {
+                        student.Grades.Add(grade);
+                    }
+                }
             }
 
             // Print class roster
             Console.WriteLine("\nClass roster:");
+
             double sum = 0.0;
 
-            for (int i = 0; i < students.Count; i++)
+            foreach(Student student in students.Values)
             {
-                Console.WriteLine(students[i] + " (" + grades[i] + ")");
-                sum += grades[i];
+                Console.WriteLine(student.Name + " (" + Math.Round(student.Grades.Average(), 2) + ")");
+                sum += student.Grades.Average();
             }
 
             double avg = sum / students.Count;
-            Console.WriteLine("Average grade: " + avg);
+
+            Console.WriteLine("Average grade: " + Math.Round(avg, 2));
+        }
+    }
+
+    public class Student
+    {
+        public int Id { get; }
+
+        public string Name { get; }
+
+        public List<double> Grades { get; } = new List<double>();
+
+        public Student(int id, string name)
+        {
+            Id = id;
+
+            Name = name;
         }
     }
 }
